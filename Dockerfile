@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM alpine:3.24
+FROM alpine:3.24 AS base
 
 RUN apk --update --no-cache add \
   bash \
@@ -79,3 +79,12 @@ RUN chown -R skpr:skpr /home/skpr/.config
 WORKDIR /data
 
 USER skpr
+
+# Run the test stage to verify the image.
+FROM base AS test
+COPY --from=ghcr.io/goss-org/goss:latest /usr/bin/goss /usr/bin/goss
+ADD goss.yml /tmp/goss.yml
+RUN goss --gossfile /tmp/goss.yml validate
+
+# This is our run image.
+FROM base AS run

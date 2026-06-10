@@ -26,6 +26,16 @@ group "default" {
   targets = ["prod"]
 }
 
+target "test" {
+  context   = "."
+  target    = "test"
+  platforms = ["linux/amd64"]
+
+  secret = [
+    "id=SKILLS_TOKEN,env=SKILLS_TOKEN"
+  ]
+}
+
 target "prod" {
   context   = "."
   platforms = PLATFORMS
