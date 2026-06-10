@@ -41,7 +41,7 @@ target "test" {
 
   secret = [
     "id=SKILLS_TOKEN,env=SKILLS_TOKEN",
-    "id=GITHUB_TOKEN,env=GITHUB_TOKEN",
+    "id=GITHUB_TOKEN,env=GH_TOKEN",
   ]
 }
 
@@ -60,7 +60,7 @@ target "prod" {
   # and is never written to any image layer.
   secret = [
     "id=SKILLS_TOKEN,env=SKILLS_TOKEN",
-    "id=GITHUB_TOKEN,env=GITHUB_TOKEN",
+    "id=GITHUB_TOKEN,env=GH_TOKEN",
   ]
 
   tags = [
