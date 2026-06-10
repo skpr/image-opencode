@@ -77,6 +77,7 @@ RUN adduser -D -u 1000 skpr && \
 # Opencode config
 RUN mkdir -p /home/skpr/.config/opencode
 COPY --chown=skpr:skpr config.json /home/skpr/.config/opencode/config.json
+COPY --chown=skpr:skpr agents/ /home/skpr/.config/opencode/agents/
 
 # Clone the PreviousNext skills repository.
 # The token is passed via a BuildKit secret and never written to any image layer.
