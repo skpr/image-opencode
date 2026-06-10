@@ -18,6 +18,9 @@ on:
       alpine:
         type: string
         default: '3.24'
+      opencode_version:
+        type: string
+        default: latest
       push:
         type: boolean
         default: false
@@ -59,6 +62,7 @@ jobs:
         uses: docker/bake-action@v7
         env:
           ALPINE_VERSION: ${{ inputs.alpine }}
+          OPENCODE_VERSION: ${{ inputs.opencode_version }}
           STREAM: ${{ inputs.stream }}
           VERSION: ${{ inputs.version }}
           SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}

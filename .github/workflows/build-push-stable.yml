@@ -3,7 +3,11 @@ name: Build and Push Stable
 on:
   push:
     branches: [ releases ]
-  workflow_dispatch: ~
+  workflow_dispatch:
+    inputs:
+      opencode_version:
+        description: 'opencode version to install (e.g. v1.17.0)'
+        required: true
   schedule:
     - cron: '0 14 * * *'   # 14:00 UTC daily
 
@@ -13,4 +17,5 @@ jobs:
     with:
       stream: stable
       push: true
+      opencode_version: ${{ inputs.opencode_version || 'latest' }}
     secrets: inherit
