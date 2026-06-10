@@ -67,8 +67,9 @@ COPY config.json /home/skpr/.config/opencode/config.json
 # Clone the PreviousNext skills repository.
 # The token is passed via a BuildKit secret and never written to any image layer.
 RUN --mount=type=secret,id=SKILLS_TOKEN \
+    SKILLS_TOKEN=$(cat /run/secrets/SKILLS_TOKEN | tr -d '[:space:]') && \
     git clone \
-      "https://$(cat /run/secrets/SKILLS_TOKEN)@github.com/previousnext/skills.git" \
+      "https://x-access-token:${SKILLS_TOKEN}@github.com/previousnext/skills.git" \
       /home/skpr/.config/opencode/skills && \
     # Strip the remote URL so the token is not retained in the .git config
     git -C /home/skpr/.config/opencode/skills remote set-url origin https://github.com/previousnext/skills.git
