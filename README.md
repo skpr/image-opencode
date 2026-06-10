@@ -32,7 +32,7 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
 | Tool | Purpose |
 |---|---|
 | [OpenCode](https://opencode.ai) | AI coding assistant (latest musl binary) |
-| Node.js 22 LTS | Runtime for MCP servers and LSP tools |
+| Node.js | Runtime for MCP servers and LSP tools |
 | [Intelephense](https://intelephense.com) | PHP language server |
 | PHP 8.4 | PHP CLI + extensions for LSP analysis |
 | Git, curl, make, rsync, patch | Standard dev utilities |
@@ -43,12 +43,11 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
 
 ## MCP servers
 
-The bundled `config.json` configures three MCP servers:
+The bundled `config.json` configures two MCP servers:
 
 | Server | Type | Notes |
 |---|---|---|
 | `chrome-devtools` | local (`npx`) | Browser automation via Chromium |
-| `atlassian` | remote (OAuth) | Jira/Confluence integration |
 | `jetbrains` | remote (SSE) | JetBrains IDE integration via `host.docker.internal:64342` |
 
 ## Usage
