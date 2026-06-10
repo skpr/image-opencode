@@ -72,6 +72,14 @@ services:
 > JetBrains MCP server to reach the IDE on the host. Docker Desktop on macOS and Windows
 > provides `host.docker.internal` automatically.
 
+## Local builds
+
+```bash
+SKILLS_TOKEN=<github-token> PLATFORMS="linux/amd64" docker buildx bake
+```
+
+`SKILLS_TOKEN` requires read access to `previousnext/skills`. Generate one with `gh auth token` if you have access, or use a fine-grained PAT with `Contents: Read` on that repo.
+
 ## API keys
 
 Pass your API key as an environment variable at runtime — do not bake it into the image:
