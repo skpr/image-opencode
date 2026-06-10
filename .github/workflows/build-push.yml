@@ -81,3 +81,4 @@ jobs:
           SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}
         with:
           push: ${{ inputs.push }}
+          source: "."
