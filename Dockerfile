@@ -64,7 +64,7 @@ ARG TARGETARCH
 ARG OPENCODE_VERSION=latest
 RUN --mount=type=secret,id=GITHUB_TOKEN \
     ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x64") && \
-    GH_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+    export GH_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     gh release download "${OPENCODE_VERSION}" \
       --repo anomalyco/opencode \
       --pattern "opencode-linux-${ARCH}-musl.tar.gz" \
