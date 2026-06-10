@@ -1,0 +1,50 @@
+command:
+  opencode:
+    exec: "opencode --version"
+    exit-status: 0
+
+  git:
+    exec: "git --version"
+    exit-status: 0
+    stdout:
+      - "git version"
+
+  gh:
+    exec: "gh --version"
+    exit-status: 0
+    stdout:
+      - "gh version"
+
+  node:
+    exec: "node --version"
+    exit-status: 0
+
+  php:
+    exec: "php84 --version"
+    exit-status: 0
+    stdout:
+      - "PHP 8.4"
+
+  intelephense:
+    exec: "which intelephense"
+    exit-status: 0
+
+  pnpm:
+    exec: "pnpm --version"
+    exit-status: 0
+
+  jq:
+    exec: "jq --version"
+    exit-status: 0
+
+  vim:
+    exec: "vim --version"
+    exit-status: 0
+
+  curl:
+    exec: "curl --version"
+    exit-status: 0
+
+  rsync:
+    exec: "rsync --version"
+    exit-status: 0

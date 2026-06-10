@@ -25,10 +25,12 @@ jobs:
           repositories: skills
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-      - name: Build Docker image
+      - name: Build and test Docker image
         uses: docker/bake-action@v7
         env:
           ALPINE_VERSION: ${{ env.alpine }}
           STREAM: ${{ env.stream }}
           VERSION: ${{ env.version }}
           SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}
+        with:
+          targets: test
