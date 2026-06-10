@@ -64,13 +64,11 @@ ARG TARGETARCH
 ARG OPENCODE_VERSION=latest
 RUN --mount=type=secret,id=GITHUB_TOKEN \
     ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x64") && \
-    RESOLVED=$([ "$OPENCODE_VERSION" = "latest" ] && \
-      curl -fsSL https://api.github.com/repos/anomalyco/opencode/releases/latest | jq -r '.tag_name' || \
-      echo "$OPENCODE_VERSION") && \
-    curl -fsSL \
-      "https://github.com/anomalyco/opencode/releases/download/${RESOLVED}/opencode-linux-${ARCH}-musl.tar.gz" \
-      -o /tmp/opencode.tar.gz && \
-    GH_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) \
+    GH_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+    gh release download "${OPENCODE_VERSION}" \
+      --repo anomalyco/opencode \
+      --pattern "opencode-linux-${ARCH}-musl.tar.gz" \
+      --output /tmp/opencode.tar.gz && \
     gh attestation verify /tmp/opencode.tar.gz \
       --repo anomalyco/opencode \
       --predicate-type https://in-toto.io/attestation/release/v0.2 && \
