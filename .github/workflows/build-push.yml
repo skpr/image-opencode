@@ -21,6 +21,7 @@ on:
       opencode_version:
         type: string
         default: latest
+        description: opencode release tag to install (e.g. v1.17.0), or "latest"
       push:
         type: boolean
         default: false
@@ -58,15 +59,25 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
+      - name: Download and verify opencode binary
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARCH=$([ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x64")
+          gh release download "${{ inputs.opencode_version }}" \
+            --repo anomalyco/opencode \
+            --pattern "opencode-linux-${ARCH}-musl.tar.gz" \
+            --output /tmp/opencode.tar.gz
+          gh attestation verify /tmp/opencode.tar.gz \
+            --repo anomalyco/opencode \
+            --predicate-type https://in-toto.io/attestation/release/v0.2
+          tar -xz -C . -f /tmp/opencode.tar.gz
       - name: Build and push Docker image
         uses: docker/bake-action@v7
         env:
           ALPINE_VERSION: ${{ inputs.alpine }}
-          OPENCODE_VERSION: ${{ inputs.opencode_version }}
           STREAM: ${{ inputs.stream }}
           VERSION: ${{ inputs.version }}
           SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}
         with:
           push: ${{ inputs.push }}
-          secrets: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}

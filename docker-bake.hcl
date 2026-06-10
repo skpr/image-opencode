@@ -2,10 +2,6 @@ variable "ALPINE_VERSION" {
   default = "3.24"
 }
 
-variable "OPENCODE_VERSION" {
-  default = "latest"
-}
-
 variable "STREAM" {
   default = "latest"
 }
@@ -35,13 +31,8 @@ target "test" {
   target    = "test"
   platforms = ["linux/amd64"]
 
-  args = {
-    OPENCODE_VERSION = OPENCODE_VERSION
-  }
-
   secret = [
     "id=SKILLS_TOKEN,env=SKILLS_TOKEN",
-    "id=GITHUB_TOKEN,env=GITHUB_TOKEN",
   ]
 }
 
@@ -51,8 +42,7 @@ target "prod" {
   platforms = PLATFORMS
 
   args = {
-    ALPINE_VERSION   = ALPINE_VERSION
-    OPENCODE_VERSION = OPENCODE_VERSION
+    ALPINE_VERSION = ALPINE_VERSION
   }
 
   # Pass the GitHub token for cloning the private skills repo.
@@ -60,7 +50,6 @@ target "prod" {
   # and is never written to any image layer.
   secret = [
     "id=SKILLS_TOKEN,env=SKILLS_TOKEN",
-    "id=GITHUB_TOKEN,env=GITHUB_TOKEN",
   ]
 
   tags = [
