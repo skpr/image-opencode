@@ -20,13 +20,13 @@ command:
     exit-status: 0
 
   php:
-    exec: "php --version"
+    exec: "php84 --version"
     exit-status: 0
     stdout:
       - "PHP 8.4"
 
   intelephense:
-    exec: "intelephense --version"
+    exec: "intelephense"
     exit-status: 0
 
   pnpm:
