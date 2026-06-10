@@ -31,7 +31,7 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
 
 | Tool | Purpose |
 |---|---|
-| [OpenCode](https://opencode.ai) | AI coding assistant (pinned musl binary) |
+| [OpenCode](https://opencode.ai) | AI coding assistant (latest musl binary) |
 | Node.js | Runtime for MCP servers and LSP tools |
 | [Intelephense](https://intelephense.com) | PHP language server |
 | PHP 8.4 | PHP CLI + extensions for LSP analysis |
