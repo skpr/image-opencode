@@ -57,7 +57,7 @@ See `docker-compose.example.yml` for a complete example. The minimal setup:
 ```yaml
 services:
   opencode:
-    image: ghcr.io/skpr/opencode:v1-stable
+    image: ghcr.io/skpr/opencode:v1-latest
     volumes:
       - .:/data
     environment:
