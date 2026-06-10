@@ -56,11 +56,19 @@ RUN ln -sf /usr/bin/php84 /usr/local/bin/php
 # Install PHP language server and pnpm
 RUN npm install -g intelephense pnpm
 
-# Install opencode — binaries are downloaded, attestation-verified, and
-# injected into the build context by the CI workflow (or locally via make/script).
-# The binary is pre-verified outside Docker so no secrets are needed here.
+# Install opencode — use musl binaries for Alpine compatibility.
+# TARGETARCH is set automatically by docker buildx: amd64 or arm64.
+# OPENCODE_VERSION defaults to "latest" (resolves via GitHub API) but can be
+# pinned to a specific release tag (e.g. v1.17.0) for stable builds.
 ARG TARGETARCH
-COPY opencode /usr/local/bin/opencode
+ARG OPENCODE_VERSION=latest
+RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x64") && \
+    RESOLVED=$([ "$OPENCODE_VERSION" = "latest" ] && \
+      curl -fsSL https://api.github.com/repos/anomalyco/opencode/releases/latest | jq -r '.tag_name' || \
+      echo "$OPENCODE_VERSION") && \
+    curl -fsSL \
+      "https://github.com/anomalyco/opencode/releases/download/${RESOLVED}/opencode-linux-${ARCH}-musl.tar.gz" \
+      | tar -xz -C /usr/local/bin/
 
 RUN adduser -D -u 1000 skpr && \
     mkdir /data && chown skpr:skpr /data
