@@ -38,7 +38,12 @@ target "test" {
 
 target "prod" {
   context   = "."
+  target    = "run"
   platforms = PLATFORMS
+
+  args = {
+    ALPINE_VERSION = ALPINE_VERSION
+  }
 
   # Pass the GitHub token for cloning the private skills repo.
   # The secret value is read from the SKILLS_TOKEN environment variable

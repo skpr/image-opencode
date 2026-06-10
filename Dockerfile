@@ -1,5 +1,9 @@
 # syntax=docker/dockerfile:1
-FROM alpine:3.24 AS base
+ARG ALPINE_VERSION=3.24
+FROM alpine:${ALPINE_VERSION} AS base
+
+LABEL org.opencontainers.image.source="https://github.com/skpr/image-opencode" \
+      org.opencontainers.image.description="opencode AI coding agent image"
 
 RUN apk --update --no-cache add \
   bash \
@@ -46,23 +50,33 @@ RUN apk --update --no-cache add \
   php84-xml \
   php84-zip
 
+# Symlink php84 -> php so tools expecting `php` in PATH work correctly.
+RUN ln -sf /usr/bin/php84 /usr/local/bin/php
+
 # Install PHP language server and pnpm
 RUN npm install -g intelephense pnpm
 
 # Install opencode — use musl binaries for Alpine compatibility.
 # TARGETARCH is set automatically by docker buildx: amd64 or arm64.
 ARG TARGETARCH
+ARG OPENCODE_VERSION=v1.17.0
+ARG OPENCODE_SHA256_AMD64=3a24e78c66682651495d0b1902e3a8f7ecbc8e7ba65bbe3b26090f8d5904f814
+ARG OPENCODE_SHA256_ARM64=4ba291d5bbd946770cdf800f594826c898005480a16fcef8a02c73dd06b95e78
 RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x64") && \
+    EXPECTED_SHA=$([ "$TARGETARCH" = "arm64" ] && echo "$OPENCODE_SHA256_ARM64" || echo "$OPENCODE_SHA256_AMD64") && \
     curl -fsSL \
-      "https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-${ARCH}-musl.tar.gz" \
-      | tar -xz -C /usr/local/bin/
+      "https://github.com/anomalyco/opencode/releases/download/${OPENCODE_VERSION}/opencode-linux-${ARCH}-musl.tar.gz" \
+      -o /tmp/opencode.tar.gz && \
+    echo "${EXPECTED_SHA}  /tmp/opencode.tar.gz" | sha256sum -c - && \
+    tar -xz -C /usr/local/bin/ -f /tmp/opencode.tar.gz && \
+    rm /tmp/opencode.tar.gz
 
-RUN adduser -D -u 1000 skpr
-RUN mkdir /data && chown skpr:skpr /data
+RUN adduser -D -u 1000 skpr && \
+    mkdir /data && chown skpr:skpr /data
 
 # Opencode config
 RUN mkdir -p /home/skpr/.config/opencode
-COPY config.json /home/skpr/.config/opencode/config.json
+COPY --chown=skpr:skpr config.json /home/skpr/.config/opencode/config.json
 
 # Clone the PreviousNext skills repository.
 # The token is passed via a BuildKit secret and never written to any image layer.
@@ -72,9 +86,8 @@ RUN --mount=type=secret,id=SKILLS_TOKEN \
       "https://x-access-token:${SKILLS_TOKEN}@github.com/previousnext/skills.git" \
       /home/skpr/.config/opencode/skills && \
     # Strip the remote URL so the token is not retained in the .git config
-    git -C /home/skpr/.config/opencode/skills remote set-url origin https://github.com/previousnext/skills.git
-
-RUN chown -R skpr:skpr /home/skpr/.config
+    git -C /home/skpr/.config/opencode/skills remote set-url origin https://github.com/previousnext/skills.git && \
+    chown -R skpr:skpr /home/skpr/.config/opencode/skills
 
 WORKDIR /data
 
@@ -83,8 +96,9 @@ USER skpr
 # Run the test stage to verify the image.
 FROM base AS test
 COPY --from=ghcr.io/goss-org/goss:latest /usr/bin/goss /usr/bin/goss
-ADD goss.yml /tmp/goss.yml
+COPY goss.yml /tmp/goss.yml
 RUN goss --gossfile /tmp/goss.yml validate
 
 # This is our run image.
 FROM base AS run
+ENTRYPOINT ["opencode"]
