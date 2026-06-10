@@ -66,6 +66,7 @@ jobs:
           STREAM: ${{ inputs.stream }}
           VERSION: ${{ inputs.version }}
           SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           push: ${{ inputs.push }}
+          secrets: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
