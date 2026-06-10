@@ -58,11 +58,16 @@ RUN npm install -g intelephense pnpm
 
 # Install opencode — use musl binaries for Alpine compatibility.
 # TARGETARCH is set automatically by docker buildx: amd64 or arm64.
+# OPENCODE_VERSION defaults to "latest" (resolves via GitHub API) but can be
+# pinned to a specific release tag (e.g. v1.17.0) for stable builds.
 ARG TARGETARCH
+ARG OPENCODE_VERSION=latest
 RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x64") && \
-    LATEST=$(curl -fsSL https://api.github.com/repos/anomalyco/opencode/releases/latest | jq -r '.tag_name') && \
+    RESOLVED=$([ "$OPENCODE_VERSION" = "latest" ] && \
+      curl -fsSL https://api.github.com/repos/anomalyco/opencode/releases/latest | jq -r '.tag_name' || \
+      echo "$OPENCODE_VERSION") && \
     curl -fsSL \
-      "https://github.com/anomalyco/opencode/releases/download/${LATEST}/opencode-linux-${ARCH}-musl.tar.gz" \
+      "https://github.com/anomalyco/opencode/releases/download/${RESOLVED}/opencode-linux-${ARCH}-musl.tar.gz" \
       -o /tmp/opencode.tar.gz && \
     sha256sum /tmp/opencode.tar.gz && \
     tar -xz -C /usr/local/bin/ -f /tmp/opencode.tar.gz && \
