@@ -1,0 +1,34 @@
+name: Build PR
+
+on:
+  pull_request: ~
+
+env:
+  alpine: "3.24"
+  version: "v1"
+  stream: "pr-${{ github.event.pull_request.number }}"
+
+jobs:
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Generate skills repo token
+        id: skills-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.SKILLS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_APP_PRIVATE_KEY }}
+          owner: previousnext
+          repositories: skills
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build Docker image
+        uses: docker/bake-action@v7
+        env:
+          ALPINE_VERSION: ${{ env.alpine }}
+          STREAM: ${{ env.stream }}
+          VERSION: ${{ env.version }}
+          SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}

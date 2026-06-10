@@ -1,0 +1,32 @@
+name: Security Scan (Latest)
+
+on:
+  workflow_dispatch: ~
+  schedule:
+    - cron: "0 14 * * *"
+
+permissions:
+  contents: read
+  packages: read
+  security-events: write
+
+jobs:
+  trivy_scan:
+    name: Trivy scan container images
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image_ref:
+          - ghcr.io/skpr/opencode:v1-latest
+    steps:
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Scan + upload (Trivy SARIF)
+        uses: skpr/scan-image-action@v1
+        with:
+          image-ref: ${{ matrix.image_ref }}

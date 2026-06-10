@@ -1,0 +1,64 @@
+name: Build and Push
+
+on:
+  workflow_call:
+    inputs:
+      runs_on:
+        type: string
+        default: ubuntu-latest
+      platforms:
+        type: string
+        default: linux/amd64,linux/arm64
+      stream:
+        type: string
+        default: latest
+      version:
+        type: string
+        default: v1
+      alpine:
+        type: string
+        default: '3.24'
+      push:
+        type: boolean
+        default: false
+    secrets:
+      SKILLS_APP_CLIENT_ID:
+        required: true
+      SKILLS_APP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  build:
+    name: Build Docker image
+    runs-on: ${{ inputs.runs_on }}
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Generate skills repo token
+        id: skills-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.SKILLS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_APP_PRIVATE_KEY }}
+          owner: previousnext
+          repositories: skills
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build and push Docker image
+        uses: docker/bake-action@v7
+        env:
+          ALPINE_VERSION: ${{ inputs.alpine }}
+          STREAM: ${{ inputs.stream }}
+          VERSION: ${{ inputs.version }}
+          SKILLS_TOKEN: ${{ steps.skills-token.outputs.token }}
+        with:
+          push: ${{ inputs.push }}

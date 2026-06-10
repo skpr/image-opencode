@@ -1,0 +1,16 @@
+name: Build and Push Latest
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: ~
+  schedule:
+    - cron: '0 14 * * *'   # 14:00 UTC daily
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-push.yml
+    with:
+      stream: latest
+      push: true
+    secrets: inherit
