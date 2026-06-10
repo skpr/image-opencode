@@ -72,6 +72,18 @@ services:
 > JetBrains MCP server to reach the IDE on the host. Docker Desktop on macOS and Windows
 > provides `host.docker.internal` automatically.
 
+Once the container is running, open a shell into it:
+
+```bash
+docker compose exec opencode bash
+```
+
+Then launch opencode from inside the container:
+
+```bash
+opencode
+```
+
 ## Local builds
 
 ```bash
