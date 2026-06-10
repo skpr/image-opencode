@@ -1,7 +1,7 @@
 services:
 
   opencode:
-    image: ghcr.io/skpr/opencode:v1-stable
+    image: ghcr.io/skpr/opencode:v1-latest
     # Mount the project directory into the container workdir.
     volumes:
       - .:/data
@@ -14,6 +14,7 @@ services:
     # Docker Desktop on macOS/Windows provides this automatically.
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Keep stdin open and allocate a TTY so opencode's interactive UI works.
+    # Keep the container running so `docker compose exec opencode bash` works.
+    command: sleep infinity
     stdin_open: true
     tty: true

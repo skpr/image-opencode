@@ -57,7 +57,7 @@ See `docker-compose.example.yml` for a complete example. The minimal setup:
 ```yaml
 services:
   opencode:
-    image: ghcr.io/skpr/opencode:v1-stable
+    image: ghcr.io/skpr/opencode:v1-latest
     volumes:
       - .:/data
     environment:
@@ -71,6 +71,19 @@ services:
 > **Note:** `extra_hosts: host.docker.internal:host-gateway` is required on Linux for the
 > JetBrains MCP server to reach the IDE on the host. Docker Desktop on macOS and Windows
 > provides `host.docker.internal` automatically.
+
+Start the container in the background, then open a shell into it:
+
+```bash
+docker compose up -d
+docker compose exec opencode bash
+```
+
+Then launch opencode from inside the container:
+
+```bash
+opencode
+```
 
 ## Local builds
 
