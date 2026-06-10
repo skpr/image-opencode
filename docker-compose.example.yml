@@ -14,7 +14,9 @@ services:
     # Docker Desktop on macOS/Windows provides this automatically.
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Keep the container running so `docker compose exec opencode bash` works.
-    command: sleep infinity
     stdin_open: true
     tty: true
+    # Exclude from `docker compose up -d` — start on demand with:
+    #   docker compose run --rm opencode
+    profiles:
+      - tools

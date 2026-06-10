@@ -31,7 +31,7 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u <your-username> --password-stdin
 
 | Tool | Purpose |
 |---|---|
-| [OpenCode](https://opencode.ai) | AI coding assistant (latest musl binary) |
+| [OpenCode](https://opencode.ai) | AI coding assistant (pinned musl binary) |
 | Node.js | Runtime for MCP servers and LSP tools |
 | [Intelephense](https://intelephense.com) | PHP language server |
 | PHP 8.4 | PHP CLI + extensions for LSP analysis |
@@ -66,23 +66,18 @@ services:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
+    profiles:
+      - tools
 ```
 
 > **Note:** `extra_hosts: host.docker.internal:host-gateway` is required on Linux for the
 > JetBrains MCP server to reach the IDE on the host. Docker Desktop on macOS and Windows
 > provides `host.docker.internal` automatically.
 
-Start the container in the background, then open a shell into it:
+The `profiles: [tools]` key excludes the service from `docker compose up -d`. Launch the TUI on demand with:
 
 ```bash
-docker compose up -d
-docker compose exec opencode bash
-```
-
-Then launch opencode from inside the container:
-
-```bash
-opencode
+docker compose run --rm opencode
 ```
 
 ## Local builds
