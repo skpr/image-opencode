@@ -46,8 +46,10 @@ RUN apk --update --no-cache add \
   php84-openssl \
   php84-phar \
   php84-posix \
+  php84-simplexml \
   php84-tokenizer \
   php84-xml \
+  php84-xmlwriter \
   php84-zip
 
 # Symlink php84 -> php so tools expecting `php` in PATH work correctly.
