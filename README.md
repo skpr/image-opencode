@@ -48,7 +48,7 @@ The bundled `config.json` configures two MCP servers:
 | Server | Type | Notes |
 |---|---|---|
 | `chrome-devtools` | local (`npx`) | Browser automation via Chromium |
-| `jetbrains` | remote (SSE) | JetBrains IDE integration via `host.docker.internal:64342` |
+| `jetbrains` | remote (SSE) | JetBrains IDE integration, host configured via `JETBRAINS_IDE_HOST` |
 
 ## Usage
 
@@ -62,17 +62,21 @@ services:
       - .:/data
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
+    network_mode: "${OPENCODE_NETWORK_MODE:-}"
     stdin_open: true
     tty: true
     profiles:
       - tools
 ```
 
-> **Note:** `extra_hosts: host.docker.internal:host-gateway` is required on Linux for the
-> JetBrains MCP server to reach the IDE on the host. Docker Desktop on macOS and Windows
-> provides `host.docker.internal` automatically.
+> **macOS (Docker Desktop):** `host.docker.internal` is provided automatically — no extra config needed.
+>
+> **Linux:** PHPStorm binds to `127.0.0.1` only. Set the following in your `.env` file or shell:
+> ```
+> OPENCODE_NETWORK_MODE=host
+> JETBRAINS_IDE_HOST=127.0.0.1
+> ```
 
 The `profiles: [tools]` key excludes the service from `docker compose up -d`. Launch the TUI on demand with:
 
