@@ -9,11 +9,15 @@ services:
       # Pass your Anthropic API key at runtime. Never hard-code it here.
       # Add ANTHROPIC_API_KEY to a .env file (gitignored) or export it in your shell.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-    # Required on Linux so that host.docker.internal resolves to the Docker host.
-    # This allows the JetBrains MCP server to connect back to the IDE on the host.
-    # Docker Desktop on macOS/Windows provides this automatically.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      # JetBrains MCP server host.
+      # macOS (Docker Desktop): host.docker.internal resolves to the host automatically.
+      # Linux: PHPStorm binds to 127.0.0.1 only, so use network_mode: host (below)
+      #        and set this to 127.0.0.1.
+      JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
+    # Linux users: PHPStorm only listens on 127.0.0.1, so host.docker.internal won't
+    # work. Uncomment network_mode below and set JETBRAINS_IDE_HOST=127.0.0.1 instead.
+    # Note: network_mode: host is Linux-only.
+    # network_mode: host
     stdin_open: true
     tty: true
     # Exclude from `docker compose up -d` — start on demand with:
