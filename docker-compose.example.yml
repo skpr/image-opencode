@@ -14,10 +14,10 @@ services:
       # Linux: PHPStorm binds to 127.0.0.1 only, so use network_mode: host (below)
       #        and set this to 127.0.0.1.
       JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
-    # Linux users: PHPStorm only listens on 127.0.0.1, so host.docker.internal won't
-    # work. Uncomment network_mode below and set JETBRAINS_IDE_HOST=127.0.0.1 instead.
-    # Note: network_mode: host is Linux-only.
-    # network_mode: host
+    # Linux: PHPStorm only listens on 127.0.0.1, so set JETBRAINS_IDE_HOST=127.0.0.1
+    # and OPENCODE_NETWORK_MODE=host in your .env file or shell.
+    # network_mode: host is Linux-only and not required on macOS (Docker Desktop).
+    network_mode: "${OPENCODE_NETWORK_MODE:-}"
     stdin_open: true
     tty: true
     # Exclude from `docker compose up -d` — start on demand with:
