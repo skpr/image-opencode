@@ -91,6 +91,12 @@ RUN --mount=type=secret,id=SKILLS_TOKEN \
     git -C /home/skpr/.config/opencode/skills remote set-url origin https://github.com/previousnext/skills.git && \
     chown -R skpr:skpr /home/skpr/.config/opencode/skills
 
+# Pre-create XDG dirs so named volumes are initialised with skpr ownership, not root.
+RUN mkdir -p \
+      /home/skpr/.local/share/opencode \
+      /home/skpr/.local/state/opencode && \
+    chown -R skpr:skpr /home/skpr/.local
+
 WORKDIR /data
 
 USER skpr
