@@ -103,4 +103,4 @@ RUN goss --gossfile /tmp/goss.yml validate
 
 # This is our run image.
 FROM base AS run
-ENTRYPOINT ["opencode"]
+ENTRYPOINT ["/bin/bash"]

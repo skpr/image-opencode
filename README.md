@@ -60,14 +60,19 @@ services:
     image: ghcr.io/skpr/opencode:v1-latest
     volumes:
       - .:/data
+      - opencode-data:/home/skpr/.local/share/opencode
+      - opencode-state:/home/skpr/.local/state/opencode
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
     network_mode: "${OPENCODE_NETWORK_MODE:-}"
     stdin_open: true
     tty: true
-    profiles:
-      - tools
+    restart: unless-stopped
+
+volumes:
+  opencode-data:
+  opencode-state:
 ```
 
 > **macOS (Docker Desktop):** `host.docker.internal` is provided automatically — no extra config needed.
@@ -78,11 +83,19 @@ services:
 > JETBRAINS_IDE_HOST=127.0.0.1
 > ```
 
-The `profiles: [tools]` key excludes the service from `docker compose up -d`. Launch the TUI on demand with:
+Start the container in the background. It will restart automatically after a reboot:
 
 ```bash
-docker compose run --rm opencode
+docker compose up -d
 ```
+
+Attach to the running container to open the opencode TUI:
+
+```bash
+docker attach $(docker compose ps -q opencode)
+```
+
+Detach without stopping the container with `Ctrl+P, Ctrl+Q`. Session history is persisted in the `opencode-data` named volume.
 
 ## Local builds
 
@@ -94,13 +107,7 @@ SKILLS_TOKEN=<github-token> PLATFORMS="linux/amd64" docker buildx bake
 
 ## API keys
 
-Pass your API key as an environment variable at runtime — do not bake it into the image:
-
-```bash
-ANTHROPIC_API_KEY=sk-ant-... docker compose run opencode
-```
-
-Or add it to a `.env` file (ensure it is in `.gitignore`):
+Pass your API key via a `.env` file (ensure it is in `.gitignore`) — do not bake it into the image:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
