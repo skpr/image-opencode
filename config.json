@@ -17,7 +17,7 @@
     },
     "jetbrains": {
       "type": "remote",
-      "url": "http://{env:JETBRAINS_IDE_HOST}:64342/sse",
+      "url": "http://host.docker.internal:{env:JETBRAINS_MCP_PORT}/sse",
       "enabled": true
     }
   }

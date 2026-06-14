@@ -48,7 +48,7 @@ The bundled `config.json` configures two MCP servers:
 | Server | Type | Notes |
 |---|---|---|
 | `chrome-devtools` | local (`npx`) | Browser automation via Chromium |
-| `jetbrains` | remote (SSE) | JetBrains IDE integration, host configured via `JETBRAINS_IDE_HOST` |
+| `jetbrains` | remote (SSE) | JetBrains IDE integration via `host.docker.internal:${JETBRAINS_MCP_PORT}` (default `64343`) |
 
 ## Usage
 
@@ -64,8 +64,9 @@ services:
       - opencode-state:/home/skpr/.local/state/opencode
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
-    network_mode: "${OPENCODE_NETWORK_MODE:-}"
+      JETBRAINS_MCP_PORT: ${JETBRAINS_MCP_PORT:-64343}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -75,12 +76,20 @@ volumes:
   opencode-state:
 ```
 
-> **macOS (Docker Desktop):** `host.docker.internal` is provided automatically — no extra config needed.
+> **JetBrains MCP:** The JetBrains MCP server only binds to `127.0.0.1`. Use `socat` on the host
+> to re-expose it so the container can reach it via `host.docker.internal`.
 >
-> **Linux:** PHPStorm binds to `127.0.0.1` only. Set the following in your `.env` file or shell:
-> ```
-> OPENCODE_NETWORK_MODE=host
-> JETBRAINS_IDE_HOST=127.0.0.1
+> ```bash
+> # Install
+> brew install socat   # macOS
+> # or
+> apt install socat    # Linux
+>
+> # Run on the host before starting the container.
+> # socat listens on 64343 (JETBRAINS_MCP_PORT) and forwards to JetBrains MCP on 64342.
+> # 64342 is taken by JetBrains itself so socat must use a different port.
+> # If 64343 is already in use, pick any free port and set JETBRAINS_MCP_PORT in your .env.
+> socat TCP-LISTEN:64343,fork,reuseaddr TCP:127.0.0.1:64342
 > ```
 
 Start the container in the background. It will restart automatically after a reboot:
@@ -111,4 +120,5 @@ Pass your API key via a `.env` file (ensure it is in `.gitignore`) — do not ba
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
+JETBRAINS_MCP_PORT=64343
 ```
