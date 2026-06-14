@@ -12,15 +12,17 @@ services:
       # Pass your Anthropic API key at runtime. Never hard-code it here.
       # Add ANTHROPIC_API_KEY to a .env file (gitignored) or export it in your shell.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      # JetBrains MCP server host.
-      # macOS (Docker Desktop): host.docker.internal resolves to the host automatically.
-      # Linux: PHPStorm binds to 127.0.0.1 only, so use network_mode: host (below)
-      #        and set this to 127.0.0.1.
-      JETBRAINS_IDE_HOST: ${JETBRAINS_IDE_HOST:-host.docker.internal}
-    # Linux: PHPStorm only listens on 127.0.0.1, so set JETBRAINS_IDE_HOST=127.0.0.1
-    # and OPENCODE_NETWORK_MODE=host in your .env file or shell.
-    # network_mode: host is Linux-only and not required on macOS (Docker Desktop).
-    network_mode: "${OPENCODE_NETWORK_MODE:-}"
+      # Port socat is listening on (forwarding to the JetBrains MCP server on the host).
+      # 64342 is taken by JetBrains itself, so socat must use a different port (default: 64343).
+      # Override if 64343 is already in use on your machine.
+      JETBRAINS_MCP_PORT: ${JETBRAINS_MCP_PORT:-64343}
+    # Expose host.docker.internal on Linux (Docker Desktop provides this automatically on macOS).
+    # JetBrains MCP only binds to 127.0.0.1 and validates the Host header; run caddy on the host
+    # to reverse-proxy it: caddy reverse-proxy --from :64343 --to 127.0.0.1:64342 — see README.
+    # Alternatively, if opencode shares a Compose project with your app (e.g. alongside nginx), you can use
+    # network_mode: "service:nginx" to share its network namespace — remove extra_hosts if you do this.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
     # Restart automatically so the container survives reboots.
