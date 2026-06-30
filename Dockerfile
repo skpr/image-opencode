@@ -6,6 +6,7 @@ LABEL org.opencontainers.image.source="https://github.com/skpr/image-opencode" \
       org.opencontainers.image.description="opencode AI coding agent image"
 
 RUN apk --update --no-cache add \
+  aws-cli \
   bash \
   ca-certificates \
   curl \
@@ -96,6 +97,9 @@ RUN mkdir -p \
       /home/skpr/.local/share/opencode \
       /home/skpr/.local/state/opencode && \
     chown -R skpr:skpr /home/skpr/.local
+
+# Ensure correct permissions for AWS credentials handling.
+RUN mkdir -p /home/skpr/.aws && chown -R skpr:skpr /home/skpr/.aws
 
 WORKDIR /data
 
